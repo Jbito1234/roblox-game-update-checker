@@ -2,24 +2,25 @@ import os
 import importlib.util
 import asyncio
 
-# Lê o token do arquivo
-with open("token.txt", "r") as f:
+# Caminho fixo do token
+token_path = "code/bot/data/token.txt"
+
+# Lê o token
+with open(token_path, "r") as f:
     DISCORD_BOT = f.read().strip()
 
-# Pasta atual
-current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Função para importar e executar todos os .py
-for filename in os.listdir(current_dir):
+# Importa e executa todos os .py na pasta code/bot (exceto initializer.py)
+for filename in os.listdir("code/bot"):
     if filename.endswith(".py") and filename != "initializer.py":
-        filepath = os.path.join(current_dir, filename)
+        filepath = os.path.join("code/bot", filename)
         spec = importlib.util.spec_from_file_location(filename[:-3], filepath)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
-# Procura um client do Discord no módulo main.py e roda
+# Inicializa o bot principal
 try:
-    from main import client
+    from main import client  # main.py precisa estar em code/bot
     client.run(DISCORD_BOT)
 except ImportError:
-    print("Nenhum client encontrado em main.py. Certifique-se de ter um bot inicializado.")
+    print("Nenhum client encontrado em main.py")
+    exit(1)
